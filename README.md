@@ -16,7 +16,7 @@ Evilのnormalモードから日本語テキストを入力して、その後norm
 5. `ESC`でEvilのnormal modeに戻る
 
 という手順が必要です。例えば上記の4.をせずにnormal modeに戻ると、
-`j``k`とかでカーソル移動しようとして、IMEに入力が取られて残念な
+`j`, `k`とかでカーソル移動しようとして、IMEに入力が取られて残念な
 ことになります。
 
 このevil-imeは、Evilのnormal modeでは自動でIMEをOFFにして、
@@ -28,6 +28,8 @@ insert modeになった場合は以前のinsert mode時のIME状態に戻しま�
 3. `ESC`でEvilのnormal modeに戻る
    (IMEは自動でOFFになる)
 
+つまり、Evilのモード変更時にはIME変更しなくて良いということです。
+
 ## Install
 
 .elファイルをload-pathの通ったディレクトリに置いて、
@@ -36,3 +38,9 @@ insert modeになった場合は以前のinsert mode時のIME状態に戻しま�
 ```
 (require 'evil-ime)
 ```
+
+## Bugs
+
+現状、バッファ切り替えなどすると、うまくいきません。
+`buffer-list-update-hook`とか`window-configuration-change-hook`とかで
+対処しようとしたけど、誤動作したりする…
