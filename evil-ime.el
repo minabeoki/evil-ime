@@ -69,9 +69,6 @@
   (unless (eq evil-ime--last-buffer (current-buffer))
     (setq evil-ime--last-buffer (current-buffer))
     (if (memq evil-state '(insert emacs))
-        (message "restore ime")
-      (message "ascii mode"))
-    (if (memq evil-state '(insert emacs))
         (evil-ime-restore-ime-state)
       (evil-ime--ascii-mode))))
 
@@ -85,7 +82,7 @@
   (add-hook 'evil-insert-state-exit-hook #'evil-ime-save-ime-state)
   (add-hook 'evil-insert-state-entry-hook #'evil-ime-restore-ime-state)
   ;(add-hook 'buffer-list-update-hook #'evil-ime-adjust-ime-state)
-  (add-hook 'window-configuration-change-hook #'evil-ime-adjust-ime-state)
+  ;(add-hook 'window-configuration-change-hook #'evil-ime-adjust-ime-state)
   (add-hook 'mac-selected-keyboard-input-source-change-hook
             #'evil-ime-change-ime-state))
 
