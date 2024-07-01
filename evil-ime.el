@@ -32,6 +32,11 @@
   :group 'evil-ime
   :type 'string)
 
+(defcustom evil-ime-ignore-buffer-pattern "^ *\\*"
+  "Ignore buffer name pattern for adjustments."
+  :group 'evil-ime
+  :type 'string)
+
 (defvar evil-ime--last-buffer nil)
 
 (defvar-local evil-ime--saved-ime-state nil)
@@ -66,7 +71,8 @@
 ;;;###autoload
 (defun evil-ime-adjust-ime-state ()
   "Select the IME mode depends on current evil-mode."
-  (unless (eq evil-ime--last-buffer (current-buffer))
+  (unless (or (eq evil-ime--last-buffer (current-buffer))
+              (string-match evil-ime-ignore-buffer-pattern (buffer-name)))
     (setq evil-ime--last-buffer (current-buffer))
     (if (memq evil-state '(insert emacs))
         (evil-ime-restore-ime-state)
@@ -81,8 +87,7 @@
 (with-eval-after-load 'evil
   (add-hook 'evil-insert-state-exit-hook #'evil-ime-save-ime-state)
   (add-hook 'evil-insert-state-entry-hook #'evil-ime-restore-ime-state)
-  ;(add-hook 'buffer-list-update-hook #'evil-ime-adjust-ime-state)
-  ;(add-hook 'window-configuration-change-hook #'evil-ime-adjust-ime-state)
+  (add-hook 'buffer-list-update-hook #'evil-ime-adjust-ime-state)
   (add-hook 'mac-selected-keyboard-input-source-change-hook
             #'evil-ime-change-ime-state))
 

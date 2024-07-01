@@ -41,6 +41,5 @@ insert modeになった場合は以前のinsert mode時のIME状態に戻しま�
 
 ## Bugs
 
-現状、バッファ切り替えなどすると、うまくいきません。
-`buffer-list-update-hook`とか`window-configuration-change-hook`とかで
-対処しようとしたけど、誤動作したりする…
+バッファ切り替えの検知に`buffer-list-update-hook`を使っていますが、無操作でも裏で`*scratch*`バッファへの切り替えが発生してhookが呼ばれるようです。
+これによる意図しないIME切り替えが発生しないように、`*scratch*`バッファ等では動作しないようにしてます。
