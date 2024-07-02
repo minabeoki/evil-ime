@@ -27,12 +27,7 @@
   :group 'evil
   :prefix "evil-ime-")
 
-(defcustom evil-ime-ascii-mode "com.apple.keylayout.ABC"
-  "The IME mode name when IME is disabled."
-  :group 'evil-ime
-  :type 'string)
-
-(defcustom evil-ime-ignore-buffer-pattern "^ *\\*"
+(defcustom evil-ime-ignore-buffer-pattern "^ +\\*"
   "Ignore buffer name pattern for adjustments."
   :group 'evil-ime
   :type 'string)
@@ -54,42 +49,41 @@
 
 (defun evil-ime--ascii-mode ()
   "Select ASCII mode."
-  (when (fboundp 'mac-select-input-source)
-    (mac-select-input-source evil-ime-ascii-mode)))
+  (when (fboundp 'mac-auto-ascii-select-input-source)
+    (mac-auto-ascii-select-input-source)))
 
-;;;###autoload
 (defun evil-ime-save-ime-state ()
   "Save the current IME mode and select ASCII mode."
   (setq evil-ime--saved-ime-state (evil-ime--get-mode))
   (evil-ime--ascii-mode))
 
-;;;###autoload
 (defun evil-ime-restore-ime-state ()
   "Restore the IME mode."
   (evil-ime--set-mode evil-ime--saved-ime-state))
 
-;;;###autoload
 (defun evil-ime-adjust-ime-state ()
   "Select the IME mode depends on current evil-mode."
   (unless (or (eq evil-ime--last-buffer (current-buffer))
-              (string-match evil-ime-ignore-buffer-pattern (buffer-name)))
+              (string-match evil-ime-ignore-buffer-pattern (buffer-name))
+              (eq (length (this-command-keys-vector)) 0))
     (setq evil-ime--last-buffer (current-buffer))
     (if (memq evil-state '(insert emacs))
         (evil-ime-restore-ime-state)
       (evil-ime--ascii-mode))))
 
-;;;###autoload
 (defun evil-ime-change-ime-state ()
   "Save the IME mode when the IME mode is changed."
   (if (memq evil-state '(insert emacs))
       (setq evil-ime--saved-ime-state (evil-ime--get-mode))))
 
+;;;###autoload
 (with-eval-after-load 'evil
   (add-hook 'evil-insert-state-exit-hook #'evil-ime-save-ime-state)
   (add-hook 'evil-insert-state-entry-hook #'evil-ime-restore-ime-state)
-  (add-hook 'buffer-list-update-hook #'evil-ime-adjust-ime-state)
-  (add-hook 'mac-selected-keyboard-input-source-change-hook
-            #'evil-ime-change-ime-state))
+  (when (boundp 'mac-selected-keyboard-input-source-change-hook)
+    (add-hook 'buffer-list-update-hook #'evil-ime-adjust-ime-state)
+    (add-hook 'mac-selected-keyboard-input-source-change-hook
+              #'evil-ime-change-ime-state)))
 
 (provide 'evil-ime)
 ;;; evil-ime.el ends here
